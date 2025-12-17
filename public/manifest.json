@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "至简标签页",
+  "version": "0.1.0",
+  "icons": {
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "index.html"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "incognito": "spanning"
+}
