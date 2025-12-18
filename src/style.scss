@@ -1,0 +1,59 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+dialog {
+  border-radius: 0.25rem;
+  border-color: #ccc;
+}
+
+.app-form {
+  padding: 1rem 2rem;
+  .item {
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    > * {
+      margin-right: 0.75rem;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  input {
+    flex: auto;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+  }
+
+  button {
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 0.2rem;
+    box-sizing: border-box;
+    text-align: center;
+    text-indent: 0.2rem;
+    letter-spacing: 0.2rem;
+    &:active {
+      background-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+  }
+}

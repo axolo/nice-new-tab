@@ -1,20 +1,17 @@
 <script>
 import config from './config/index.js'
+import LinkForm from './components/link-form.vue'
+import SearchBar from './components/search-bar.vue';
 
 export default {
-  data() {
-    return {
-      query: ''
-    }
+  components: {
+    SearchBar,
+    LinkForm
   },
-  computed: {
-    config: {
-      get() {
-        return config.get()
-      },
-      set(config) {
-        config.set(config)
-      }
+  data() {
+    const { links } = config.get()
+    return {
+      links
     }
   },
   methods: {
@@ -24,9 +21,10 @@ export default {
     menu(item) {
       console.log(item)
     },
-    search() {
-      if (!this.query) return
-      location.replace(`https://cn.bing.com/search?q=${this.query}`, '_blank')
+    linkAdd(link) {
+      this.links.push(link)
+      config.set({ links: this.links })
+      this.$refs.linkForm.close()
     }
   }
 }
@@ -34,67 +32,68 @@ export default {
 
 <template>
   <div class="app">
-    <div class="search" @keyup.enter="search">
-      <input class="input" v-model="query" placeholder="必应搜索">
-      <div class="button" @click="search">搜索</div>
-    </div>
+    <SearchBar />
     <div class="links">
-      <div 
-        class="link" 
-        v-for="(item, index) in config.links" 
+      <div
+        class="link"
+        v-for="(item, index) in links"
         :key="index"
         @click="open(item)"
         @contextmenu.prevent="menu(item, $event)"
       >
-        <div>{{ item.name }}</div>
+        <img class="icon" :src="item.icon" :alt="item.name">
+        <div class="name">{{ item.name }}</div>
       </div>
+      <div class="link" @click="$refs.linkForm.showModal()">
+        <div class="icon">➕</div>
+        <div class="name">添加</div>
+      </div>
+      <dialog ref="linkForm" class="link-form">
+        <LinkForm
+          @change="linkAdd"
+          @cancel="$refs.linkForm.close()"
+        />
+      </dialog>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .app {
-  min-height: 50vh;
-  padding: 2rem;
+  min-height: 75vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  .search {
-    display: flex;
-    align-items: center;
-    .input {
-      padding: 1rem;
-      border: 1px solid #000;
-      border-right: none;
-      border-radius: 0.5rem 0 0 0.5rem;
-    }
-    .button {
-      padding: 1rem;
-      border: 1px solid #000;
-      border-radius: 0 0.5rem 0.5rem 0;
-      border-left: none;
-      background-color: rgba(255, 255, 255, 0.25);
-      cursor: pointer;
-    }
-  }
+  gap: 4rem;
   .links {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
     .link {
       cursor: pointer;
-      padding: 1rem;
-      background-color: rgba(255, 255, 255, 0.25);      
-      border: 1px solid #000;
-      border-radius: 0.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.5rem;
+      .icon {
+        width: 2rem;
+        height: 2rem;
+        padding: 0.5rem;
+        background-color: #ccc;
+        border-radius: 0.5rem;
+        object-fit: cover;
+        text-align: center;
+        line-height: 2rem;
+        font-size: 16px;
+      }
+      .name {
+        color: #666;
+        text-align: center;
+        font-weight: 500;
+      }
     }
   }
 }
