@@ -81,13 +81,13 @@ export default {
       cursor: pointer;
       position: absolute;
       right: 0;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.25rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
       object-fit: cover;
-      font-size: 1.25rem;
       text-align: center;
-      line-height: 2rem;
+      font-size: 20px;
+      line-height: 32px;
     }
   }
 }

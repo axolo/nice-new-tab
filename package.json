@@ -1,9 +1,10 @@
 {
   "name": "@axolo/nice-new-tab",
   "description": "New Tab Page Extension for Google Chromium-based Browsers.",
-  "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
+  "license": "Apache 2.0",
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -16,5 +17,17 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "sass-embedded": "^1.97.0",
     "vite": "^7.2.4"
+  },
+  "keywords": [
+    "nice new tab",
+    "new tab",
+    "chrome extension",
+    "edge extension",
+    "browser extension"
+  ],
+  "homepage": "https://github.com/axolo/nice-new-tab#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axolo/nice-new-tab.git"
   }
 }

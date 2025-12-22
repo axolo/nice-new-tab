@@ -21,7 +21,7 @@ export default {
 <template>
   <div class="search" @keyup.enter="search">
     <input class="input" v-model="query" placeholder="必应">
-    <div class="button" @click="search">搜索</div>
+    <div class="button" @click="search">🔍</div>
   </div>
 </template>
 
@@ -29,8 +29,8 @@ export default {
 .search {
   box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.125);
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 2.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.125);
+  border-radius: 32px;
   outline: none;
   overflow: hidden;
   display: flex;
@@ -38,20 +38,18 @@ export default {
   .input {
     box-sizing: border-box;
     flex: 1;
-    min-width: 25rem;
-    max-width: max-content;
-    padding: 0.75rem 1rem;
-    border-radius: 2.5rem 0 0 2.5rem;
+    min-width: 480px;
+    padding: 12px 16px;
+    border-radius: 20px 0 0 20px;
+    font-size: 16px;
     border: none;
     outline: none;
   }
   .button {
     cursor: pointer;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0 2.5rem 2.5rem 0;
-    background-color: rgba(255, 255, 255, 0.25);
-    letter-spacing: 0.125rem;
-    text-indent: 0.125rem;
+    padding: 12px 16px;
+    border-radius: 0 20px 20px 0;
+    background-color: rgba(255, 255, 255, 0.5);
     outline: none;
     display: flex;
     align-items: center;
