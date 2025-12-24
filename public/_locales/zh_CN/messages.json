@@ -1,0 +1,18 @@
+{
+  "extensionName": {
+    "message": "至简标签页",
+    "description": "扩展名称"
+  },
+  "extensionDescription": {
+    "message": "一个极致精简的基于 Google Chromium 内核浏览器的新标签页扩展。",
+    "description": "扩展描述"
+  },
+  "extensionTitle": {
+    "message": "新标签页",
+    "description": "扩展标题"
+  },
+  "confirmDelete": {
+    "message": "确定删除吗？",
+    "description": "确认删除"
+  }
+}

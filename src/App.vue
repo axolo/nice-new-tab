@@ -1,5 +1,4 @@
 <script>
-import config from './config/index.js'
 import SearchBar from './components/search-bar.vue'
 import LinkItem from './components/link-item.vue'
 import LinkForm from './components/link-form.vue'
@@ -13,23 +12,24 @@ export default {
     LinkAdd
   },
   data() {
-    const { links } = config.get()
     return {
-      links,
+      links: [],
       editable: false,
       dialog: false
     }
+  },
+  async created() {
+    document.title =this.$i18n('extensionTitle', '新标签页')
+    const settings = await this.$settings.get()
+    this.links = settings.links || []
   },
   methods: {
     open(item) {
       if (this.editable) return
       location.replace(item.url)
     },
-    menu(item) {
-      console.log(item)
-      this.editable = !this.editable
-    },
-    show() {
+    show(index) {
+      if (!this.editable) return
       this.dialog = true
       this.$refs.linkForm.showModal()
     },
@@ -38,12 +38,17 @@ export default {
       this.$refs.linkForm.close()
     },
     save(link) {
-      this.links.push(link)
-      config.set({ links: this.links })
+      const links = [...this.links, link]
+        .sort((a, b) => a.order - b.order)
+        .map((i, order) => ({ ...i, order }))
+      this.links = links
+      this.$settings.set({ links })
       this.$refs.linkForm.close()
     },
     del(index) {
-      console.log(index)
+      if (!confirm(this.$i18n('confirmDelete', '确定删除吗？'))) return;
+      this.links.splice(index, 1)
+      this.$settings.set({ links: this.links })
     }
   }
 }
@@ -51,23 +56,20 @@ export default {
 
 <template>
   <div class="nice-new-tab">
-    <div class="app">
+    <div :class="['navi', { editable }]">
+      <div class="settings" @click="editable = !editable">⚙</div>
+    </div>
+
+    <div class="main">
       <SearchBar />
 
       <div class="links">
-        <div
-          v-for="(item, index) in links"
-          :key="index"
-          class="item"
-          @click="open(item)"
-          @contextmenu.prevent="menu(item, $event)"
-        >
-        <div v-if="editable" class="del" @click="del(index)">✖</div>
-        <LinkItem v-model="links[index]" />
+        <div v-for="(item, index) in links" :key="item.name" class="item" @click="open(item)">
+          <div v-if="editable" class="del" @click="del(index)">✖</div>
+          <LinkItem v-model="links[index]" :editable="editable" @click="show(index)" />
         </div>
-        <div v-if="editable" @click="show" @contextmenu.prevent="menu(item, $event)">
-          <LinkAdd />
-        </div>
+
+        <LinkAdd v-if="editable" @click="show" />
       </div>
 
       <dialog ref="linkForm" class="link-form">
@@ -80,7 +82,30 @@ export default {
 <style lang="scss" scoped>
 .nice-new-tab {
   height: 100vh;
-  .app {
+  .navi {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 24px;
+    opacity: 0;
+    .settings {
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1;
+      user-select: none;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    &:hover {
+      opacity: 1;
+    }
+  }
+  .editable {
+    opacity: 1;
+  }
+  .main {
     min-height: 75vh;
     display: flex;
     flex-direction: column;
@@ -90,17 +115,19 @@ export default {
     .links {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
+      justify-items: center;
       gap: 48px;
       .item {
         position: relative;
         .del {
+          cursor: pointer;
           position: absolute;
           top: -4px;
-          right: -4px;
-          width: 24px;
-          height: 24px;
+          right: 0;
+          width: 20px;
+          height: 20px;
           text-align: center;
-          cursor: pointer;
+          line-height: 1;
           background-color: #f56c6c;
           color: #fff;
           border-radius: 50%;
@@ -108,12 +135,6 @@ export default {
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-        .edit {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
         }
       }
     }

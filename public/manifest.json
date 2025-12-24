@@ -1,8 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "至简标签页",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
   "version": "0.1.0",
   "incognito": "spanning",
+  "default_locale": "zh_CN",
   "icons": {
     "128": "icons/icon128.png"
   },

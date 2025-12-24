@@ -17,10 +17,11 @@
     width: 56px;
     height: 56px;
     border: 1px dashed #ccc;
-    background-color: #f5f5f5;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
     font-size: 24px;
     line-height: 1;
-    border-radius: 12px;
+    user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;

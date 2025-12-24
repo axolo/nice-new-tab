@@ -1,7 +1,7 @@
 {
   "name": "@axolo/nice-new-tab",
   "description": "New Tab Page Extension for Google Chromium-based Browsers.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "Apache 2.0",
   "type": "module",
   "private": true,

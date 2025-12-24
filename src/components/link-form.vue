@@ -16,6 +16,7 @@ export default {
         name: null,
         url: null,
         icon: null,
+        order: null,
         ...this.modelValue
       }
     }
@@ -50,6 +51,13 @@ export default {
       >
     </div>
     <div class="item">
+      <label>图标</label>
+      <input
+        v-model="link.icon"
+        placeholder="图标地址，点击右下图标自动获取"
+      >
+    </div>
+    <div class="item">
       <label>名称</label>
       <input
         v-model="link.name"
@@ -57,10 +65,12 @@ export default {
       >
     </div>
     <div class="item">
-      <label>图标</label>
+      <label>排序</label>
       <input
-        v-model="link.icon"
-        placeholder="图标，点击右下图标自动获取"
+        v-model="link.order"
+        type="number"
+        step="0.1"
+        placeholder="排序，数字越小越靠前"
       >
     </div>
     <div class="item">
@@ -83,7 +93,7 @@ export default {
       right: 0;
       width: 32px;
       height: 32px;
-      border-radius: 16px;
+      border-radius: 4px;
       object-fit: cover;
       text-align: center;
       font-size: 20px;
