@@ -10,8 +10,15 @@ class Settings {
 
   async get() {
     const settings = {
-      search: 'https://cn.bing.com/search?q=',
-      links: []
+      search: 0,
+      background: '', // 'https://picsum.photos/1920/1080'
+      links: [],
+      searchs: [{
+        name: '必应',
+        url: 'https://cn.bing.com/search?q=',
+        icon: 'https://cn.bing.com/favicon.ico',
+        order: 1
+      }]
     }
 
     const value = await storage.get(this.config.key)

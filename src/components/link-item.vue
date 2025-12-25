@@ -8,6 +8,10 @@ export default {
     editable: {
       type: Boolean,
       default: false
+    },
+    background: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -26,7 +30,7 @@ export default {
       <img v-else :src="link.icon" :alt="link.name" :onerror="() => error = true">
       <slot />
     </div>
-    <div class="name">{{ link.name }}</div>
+    <div :class="['name', { background }]">{{ link.name }}</div>
   </div>
 </template>
 
@@ -47,6 +51,12 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    &:hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+    }
+    &:active {
+      scale: 1.1;
+    }
     img {
       width: 32px;
       height: 32px;
@@ -61,13 +71,17 @@ export default {
   .name {
     text-align: center;
     font-size: 14px;
-    color: #555;
+    color: #666;
   }
   .editable {
     border: 1px dashed #ccc;
     img, .text {
       opacity: 0.5;
     }
+  }
+  .background {
+    color: #fff;
+    mix-blend-mode: difference;
   }
 }
 </style>

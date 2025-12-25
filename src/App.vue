@@ -1,5 +1,5 @@
 <script>
-import NavBar from './components/nav-bar.vue'
+  import ContextMenu from './components/context-menu.vue'
 import SearchBar from './components/search-bar.vue'
 import LinkItem from './components/link-item.vue'
 import LinkForm from './components/link-form.vue'
@@ -7,7 +7,7 @@ import LinkAdd from './components/link-add.vue'
 
 export default {
   components: {
-    NavBar,
+    ContextMenu,
     SearchBar,
     LinkItem,
     LinkForm,
@@ -16,18 +16,26 @@ export default {
   data() {
     return {
       links: [],
+      form: {},
+      backgroundImage: false,
       editable: false,
       dialog: false,
-      form: {}
+      contextMenu: {
+        show: false,
+        x: 0,
+        y: 0
+      }
     }
   },
   async created() {
     document.title =this.$i18n('extensionTitle', '新标签页')
     const settings = await this.$settings.get()
+    this.backgroundImage = settings.background && `url(${settings.background})`
     this.links = settings.links || []
   },
   methods: {
     open(index) {
+      console.log('open')
       if (!this.editable) {
         location.replace(this.links[index].url)
       } else {
@@ -37,6 +45,7 @@ export default {
       }
     },
     add(order) {
+      console.log('add', this.editable)
       this.form = { order }
       this.dialog = true
       this.$refs.linkForm.showModal()
@@ -55,38 +64,70 @@ export default {
       this.$refs.linkForm.close()
     },
     del(index) {
+      console.log('del')
       if (!confirm(this.$i18n('confirmDelete', '确定删除吗？'))) return;
       this.links.splice(index, 1)
       this.links = this.links.map((i, index) => ({ ...i, order: index + 1 }))
       this.$settings.set({ links: this.links })
+      this.$refs.linkForm.close()
+    },
+    showMenu(e) {
+      if (this.dialog) return
+      this.contextMenu = {
+        show: true,
+        x: e.clientX + 'px',
+        y: e.clientY + 'px'
+      }
+    },
+    hideMenu() {
+      console.log('hideMenu', this.editable)
+      if (this.dialog) return
+      this.contextMenu = { show: false }
+      this.editable = false
+    },
+    pickMenu(menu) {
+      switch (menu.emit) {
+        default:
+          console.log(menu)
+          break
+        case 'search':
+          this.$settings.set({ search: 0 })
+          break
+        case 'link':
+          this.editable = true
+          break
+      }
     }
   }
 }
 </script>
 
 <template>
-  <div class="nice-new-tab">
-    <NavBar @toggle="editable = !editable" />
+  <div class="nice-new-tab" :style="{ backgroundImage }" @click.stop="hideMenu" @contextmenu.prevent="showMenu">
     <div class="main">
       <SearchBar />
       <div class="links">
-        <div v-for="(item, index) in links" :key="item.name" @click="open(index)">
-          <LinkItem v-model="links[index]" :editable="editable">
+        <div v-for="(item, index) in links" :key="item.name" @click.stop="open(index)">
+          <LinkItem v-model="links[index]" :editable="editable" :background="!!backgroundImage">
             <div v-if="editable" class="del" @click.stop="del(index)">✖</div>
           </LinkItem>
         </div>
-        <LinkAdd v-if="editable" @click="add(links.length + 1)" />
+        <LinkAdd v-if="editable" @click.stop="add(links.length + 1)" />
       </div>
       <dialog ref="linkForm" class="link-form">
         <LinkForm v-if="dialog" v-model="form" @change="save" @cancel="hide" />
       </dialog>
     </div>
   </div>
+  <ContextMenu v-model="contextMenu" @select="pickMenu" />
 </template>
 
 <style lang="scss" scoped>
 .nice-new-tab {
+  position: relative;
   height: 100vh;
+  background-size: cover;
+  background-position: center;
   .main {
     min-height: 75vh;
     display: flex;
