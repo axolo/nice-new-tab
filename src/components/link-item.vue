@@ -24,6 +24,7 @@ export default {
     <div :class="['icon', { editable }]">
       <div v-if="error" class="text">🌏</div>
       <img v-else :src="link.icon" :alt="link.name" :onerror="() => error = true">
+      <slot />
     </div>
     <div class="name">{{ link.name }}</div>
   </div>
@@ -37,6 +38,7 @@ export default {
   align-items: center;
   gap: 8px;
   .icon {
+    position: relative;
     box-sizing: border-box;
     width: 56px;
     height: 56px;
@@ -62,12 +64,8 @@ export default {
     color: #555;
   }
   .editable {
-    background-color: rgba(255, 255, 255, 0.5);
     border: 1px dashed #ccc;
-    img {
-      opacity: 0.5;
-    }
-    .text {
+    img, .text {
       opacity: 0.5;
     }
   }

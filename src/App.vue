@@ -1,4 +1,5 @@
 <script>
+import NavBar from './components/nav-bar.vue'
 import SearchBar from './components/search-bar.vue'
 import LinkItem from './components/link-item.vue'
 import LinkForm from './components/link-form.vue'
@@ -6,6 +7,7 @@ import LinkAdd from './components/link-add.vue'
 
 export default {
   components: {
+    NavBar,
     SearchBar,
     LinkItem,
     LinkForm,
@@ -15,7 +17,8 @@ export default {
     return {
       links: [],
       editable: false,
-      dialog: false
+      dialog: false,
+      form: {}
     }
   },
   async created() {
@@ -24,23 +27,29 @@ export default {
     this.links = settings.links || []
   },
   methods: {
-    open(item) {
-      if (this.editable) return
-      location.replace(item.url)
+    open(index) {
+      if (!this.editable) {
+        location.replace(this.links[index].url)
+      } else {
+        this.form = this.links[index]
+        this.dialog = true
+        this.$refs.linkForm.showModal()
+      }
     },
-    show(index) {
-      if (!this.editable) return
+    add(order) {
+      this.form = { order }
       this.dialog = true
       this.$refs.linkForm.showModal()
     },
     hide() {
       this.dialog = false
       this.$refs.linkForm.close()
+      this.form = {}
     },
     save(link) {
       const links = [...this.links, link]
         .sort((a, b) => a.order - b.order)
-        .map((i, order) => ({ ...i, order }))
+        .map((i, index) => ({ ...i, order: index + 1 }))
       this.links = links
       this.$settings.set({ links })
       this.$refs.linkForm.close()
@@ -48,6 +57,7 @@ export default {
     del(index) {
       if (!confirm(this.$i18n('confirmDelete', '确定删除吗？'))) return;
       this.links.splice(index, 1)
+      this.links = this.links.map((i, index) => ({ ...i, order: index + 1 }))
       this.$settings.set({ links: this.links })
     }
   }
@@ -56,24 +66,19 @@ export default {
 
 <template>
   <div class="nice-new-tab">
-    <div :class="['navi', { editable }]">
-      <div class="settings" @click="editable = !editable">⚙</div>
-    </div>
-
+    <NavBar @toggle="editable = !editable" />
     <div class="main">
       <SearchBar />
-
       <div class="links">
-        <div v-for="(item, index) in links" :key="item.name" class="item" @click="open(item)">
-          <div v-if="editable" class="del" @click="del(index)">✖</div>
-          <LinkItem v-model="links[index]" :editable="editable" @click="show(index)" />
+        <div v-for="(item, index) in links" :key="item.name" @click="open(index)">
+          <LinkItem v-model="links[index]" :editable="editable">
+            <div v-if="editable" class="del" @click.stop="del(index)">✖</div>
+          </LinkItem>
         </div>
-
-        <LinkAdd v-if="editable" @click="show" />
+        <LinkAdd v-if="editable" @click="add(links.length + 1)" />
       </div>
-
       <dialog ref="linkForm" class="link-form">
-        <LinkForm v-if="dialog" @change="save" @cancel="hide" />
+        <LinkForm v-if="dialog" v-model="form" @change="save" @cancel="hide" />
       </dialog>
     </div>
   </div>
@@ -82,29 +87,6 @@ export default {
 <style lang="scss" scoped>
 .nice-new-tab {
   height: 100vh;
-  .navi {
-    display: flex;
-    justify-content: flex-end;
-    padding: 12px 24px;
-    opacity: 0;
-    .settings {
-      cursor: pointer;
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1;
-      user-select: none;
-      color: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    &:hover {
-      opacity: 1;
-    }
-  }
-  .editable {
-    opacity: 1;
-  }
   .main {
     min-height: 75vh;
     display: flex;
@@ -117,25 +99,22 @@ export default {
       grid-template-columns: repeat(6, 1fr);
       justify-items: center;
       gap: 48px;
-      .item {
-        position: relative;
-        .del {
-          cursor: pointer;
-          position: absolute;
-          top: -4px;
-          right: 0;
-          width: 20px;
-          height: 20px;
-          text-align: center;
-          line-height: 1;
-          background-color: #f56c6c;
-          color: #fff;
-          border-radius: 50%;
-          font-size: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+      .del {
+        cursor: pointer;
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 1;
+        background-color: #f56c6c;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

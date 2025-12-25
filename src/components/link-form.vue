@@ -3,6 +3,10 @@ export default {
   props: {
     modelValue: {
       type: Object
+    },
+    title: {
+      type: String,
+      default: '编辑链接'
     }
   },
   emits: [
@@ -57,27 +61,34 @@ export default {
         placeholder="图标地址，点击右下图标自动获取"
       >
     </div>
-    <div class="item">
-      <label>名称</label>
-      <input
-        v-model="link.name"
-        placeholder="名称"
-      >
-    </div>
-    <div class="item">
-      <label>排序</label>
-      <input
-        v-model="link.order"
-        type="number"
-        step="0.1"
-        placeholder="排序，数字越小越靠前"
-      >
+    <div class="row">
+      <div class="form">
+        <div class="item">
+          <label>名称</label>
+          <input
+            v-model="link.name"
+            placeholder="名称"
+          >
+        </div>
+        <div class="item">
+          <label>排序</label>
+          <input
+            v-model="link.order"
+            type="number"
+            step="0.1"
+            placeholder="排序，数字越小越靠前"
+          >
+        </div>
+      </div>
+      <div class="col" @click="url(true)">
+        <img v-if="link.icon" :src="link.icon" alt="图标" class="icon">
+        <div v-else class="icon" @click="url(true)">🌏</div>
+        <div class="auto">获取图标</div>
+      </div>
     </div>
     <div class="item">
       <button :disabled="!link.url" @click="change">保存</button>
       <button @click="cancel">关闭</button>
-      <img v-if="link.icon" :src="link.icon" alt="图标" title="重新获取" class="icon" @click="url(true)">
-      <div v-else title="获取图标" class="icon" @click="url(true)">🌏</div>
     </div>
   </div>
 </template>
@@ -85,19 +96,39 @@ export default {
 <style lang="scss" scoped>
 .link-form {
   min-width: 25rem;
-  .item {
-    position: relative;
-    .icon {
+  .row {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    .form {
+      flex: auto;
+    }
+    .col {
       cursor: pointer;
-      position: absolute;
-      right: 0;
-      width: 32px;
-      height: 32px;
+      margin-left: 20px;
+      padding: 12px;
+      background-color: rgba(0, 0, 0, 0.05);
       border-radius: 4px;
-      object-fit: cover;
-      text-align: center;
-      font-size: 20px;
-      line-height: 32px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      .icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        object-fit: cover;
+        text-align: center;
+        font-size: 24px;
+        line-height: 32px;
+      }
+      .auto {
+        text-decoration: underline;
+        font-size: 12px;
+        color: #606266;
+      }
     }
   }
 }
