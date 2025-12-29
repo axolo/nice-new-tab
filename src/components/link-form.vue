@@ -82,7 +82,7 @@ export default {
       </div>
       <div class="col" @click="url(true)">
         <img v-if="link.icon" :src="link.icon" alt="图标" class="icon">
-        <div v-else class="icon" @click="url(true)">🌏</div>
+        <div v-else class="icon" @click="url(true)">🔗</div>
         <div class="auto">获取图标</div>
       </div>
     </div>
@@ -95,7 +95,7 @@ export default {
 
 <style lang="scss" scoped>
 .link-form {
-  min-width: 25rem;
+  min-width: 400px;
   .row {
     margin-bottom: 20px;
     display: flex;

@@ -2,35 +2,36 @@
 export default {
   data() {
     return {
-      engine: {},
-      query: ''
+      searchs: [], // 搜索引擎列表
+      search: {}, // 当前搜索引擎
+      query: '' // 当前搜索关键词
     }
   },
   async created() {
-    this.settings = await this.$settings.get()
-    this.engine = this.settings.searchs[this.settings.search]
+    this.searchs = await this.$storage.get('searchs') || this.$config.searchs
+    this.search = this.searchs[0]
   },
   methods: {
-    search() {
+    submit() {
       const query = this.query.trim()
       if (!query) return
-      location.replace(this.engine.url + query, '_blank')
+      location.replace(this.search.url + query, '_blank')
     }
   }
 }
 </script>
 
 <template>
-  <div class="search" @keyup.enter="search">
+  <div class="search" @keyup.enter="submit">
     <div class="icon prefix">
-      <img :src="engine.icon" alt="图标">
+      <img :src="search.icon" alt="图标">
     </div>
     <input
       v-model="query"
       class="input"
-      :placeholder="engine.name + $i18n('searchPlaceholder', '搜索')"
+      :placeholder="search.name + $i18n('searchPlaceholder', '搜索')"
     >
-    <div class="icon suffix" @click="search">🔍</div>
+    <div class="icon suffix" @click="submit">🔍</div>
   </div>
 </template>
 
@@ -38,23 +39,26 @@ export default {
 .search {
   box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.125);
-  border-radius: 12px;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
   outline: none;
   overflow: hidden;
   display: flex;
   align-items: stretch;
   .icon {
     cursor: pointer;
-    padding: 8px 12px;
+    padding: 16px;
     background-color: rgba(255, 255, 255, 1);
     outline: none;
+    user-select: none;
+    font-size: 20px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  .prefix {
+    &:active {
+      background-color: rgba(255, 255, 255, 0.75);
+    }
     img {
       width: 24px;
       height: 24px;
@@ -65,16 +69,9 @@ export default {
     box-sizing: border-box;
     flex: 1;
     min-width: 480px;
-    padding: 16px 0;
     font-size: 15px;
     border: none;
     outline: none;
-  }
-  .suffix {
-    font-size: 20px;
-    &:active {
-      background-color: rgba(255, 255, 255, 0.75);
-    }
   }
 }
 </style>

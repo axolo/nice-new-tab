@@ -26,7 +26,7 @@ export default {
 <template>
   <div class="link-item">
     <div :class="['icon', { editable }]">
-      <div v-if="error" class="text">🌏</div>
+      <span v-if="error" class="text">🔗</span>
       <img v-else :src="link.icon" :alt="link.name" :onerror="() => error = true">
       <slot />
     </div>
@@ -47,12 +47,16 @@ export default {
     width: 56px;
     height: 56px;
     background-color: #fff;
+    user-select: none;
     border-radius: 12px;
+    line-height: 1;
+    font-size: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
     &:hover {
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
     }
     &:active {
       scale: 1.1;
@@ -64,11 +68,11 @@ export default {
     }
     .text {
       line-height: 1;
-      font-size: 33px;
-      user-select: none;
     }
   }
   .name {
+    max-width: 72px;
+    word-break: break-word;
     text-align: center;
     font-size: 14px;
     color: #666;

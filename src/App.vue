@@ -15,9 +15,10 @@ export default {
   },
   data() {
     return {
-      links: [],
-      form: {},
-      backgroundImage: false,
+      settings: {}, // 设置
+      backgroundImage: false, // 背景图片
+      links: [], // 链接列表
+      form: {}, // 链接表单
       editable: false,
       dialog: false,
       contextMenu: {
@@ -29,9 +30,10 @@ export default {
   },
   async created() {
     document.title =this.$i18n('extensionTitle', '新标签页')
-    const settings = await this.$settings.get()
-    this.backgroundImage = settings.background && `url(${settings.background})`
-    this.links = settings.links || []
+    this.settings = await this.$storage.get('settings') || this.$config.settings
+    const { wallpaper } = this.settings
+    this.backgroundImage = wallpaper && `url(${wallpaper})`
+    this.links = await this.$storage.get('links') || this.$config.links
   },
   methods: {
     open(index) {
@@ -60,16 +62,20 @@ export default {
         .sort((a, b) => a.order - b.order)
         .map((i, index) => ({ ...i, order: index + 1 }))
       this.links = links
-      this.$settings.set({ links })
+      this.$storage.set('links', links)
       this.$refs.linkForm.close()
+      this.editable = false
+      this.dialog = false
     },
     del(index) {
       console.log('del')
       if (!confirm(this.$i18n('confirmDelete', '确定删除吗？'))) return;
       this.links.splice(index, 1)
       this.links = this.links.map((i, index) => ({ ...i, order: index + 1 }))
-      this.$settings.set({ links: this.links })
+      this.$storage.set('links', this.links)
       this.$refs.linkForm.close()
+      this.editable = false
+      this.dialog = false
     },
     showMenu(e) {
       if (this.dialog) return
@@ -91,7 +97,7 @@ export default {
           console.log(menu)
           break
         case 'search':
-          this.$settings.set({ search: 0 })
+          console.log(menu)
           break
         case 'link':
           this.editable = true
@@ -134,7 +140,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 72px;
+    gap: 64px;
     .links {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
