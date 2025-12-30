@@ -1,30 +1,35 @@
+/**
+ * **存储类**
+ *
+ * 1. 支持 localStorage 和 chrome.storage.sync 两种存储方式，根据环境自动选择
+ * 2. chrome.storage.sync 修改数据时，会 array 转换为 object，因此一律存储为 json 字符串
+ */
 class Storage {
   constructor(options = {}) {
-    this.prefix = options.prefix || 'nice-new-tab-'
     this.local = options.local || !chrome?.storage?.sync
   }
 
   async get(key) {
-    key = this.prefix + key
     if (this.local) {
-      return JSON.parse(localStorage.getItem(key))
+      const value = localStorage.getItem(key)
+      return value && JSON.parse(value)
     }
-    const settings = await chrome.storage.sync.get([key])
-    return settings[key]
+    const item = await chrome.storage.sync.get([key])
+    const value = item[key]
+    return value && JSON.parse(value)
   }
 
   async set(key, value) {
-    key = this.prefix + key
+    const json = JSON.stringify(value)
     if (this.local) {
-      localStorage.setItem(key, JSON.stringify(value))
+      localStorage.setItem(key, json)
     } else {
-      await chrome.storage.sync.set({ [key]: value })
+      await chrome.storage.sync.set({ [key]: json })
     }
     return value
   }
 
   remove(key) {
-    key = this.prefix + key
     return this.local
       ? chrome.storage.sync.remove(key)
       : localStorage.removeItem(key)

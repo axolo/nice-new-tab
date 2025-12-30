@@ -2,13 +2,16 @@
 export default {
   data() {
     return {
+      settings: {}, // 系统设置
       searchs: [], // 搜索引擎列表
       search: {}, // 当前搜索引擎
       query: '' // 当前搜索关键词
     }
   },
   async created() {
-    this.searchs = await this.$storage.get('searchs') || this.$config.searchs
+    const settings = await this.$storage.get(this.$config.name)
+    this.settings = { ...this.$config, ...settings }
+    this.searchs = this.settings.searchs
     this.search = this.searchs[0]
   },
   methods: {

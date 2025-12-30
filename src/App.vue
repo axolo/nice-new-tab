@@ -1,5 +1,5 @@
 <script>
-  import ContextMenu from './components/context-menu.vue'
+import ContextMenu from './components/context-menu.vue'
 import SearchBar from './components/search-bar.vue'
 import LinkItem from './components/link-item.vue'
 import LinkForm from './components/link-form.vue'
@@ -15,27 +15,34 @@ export default {
   },
   data() {
     return {
-      settings: {}, // 设置
+      settings: null, // 系统设置
       backgroundImage: false, // 背景图片
       links: [], // 链接列表
       form: {}, // 链接表单
-      editable: false,
-      dialog: false,
-      contextMenu: {
+      dialog: false, // 表单弹窗
+      editable: false, // 编辑模式
+      contextMenu: { // 右键菜单
         show: false,
         x: 0,
         y: 0
       }
     }
   },
-  async created() {
+  created() {
     document.title =this.$i18n('extensionTitle', '新标签页')
-    this.settings = await this.$storage.get('settings') || this.$config.settings
-    const { wallpaper } = this.settings
-    this.backgroundImage = wallpaper && `url(${wallpaper})`
-    this.links = await this.$storage.get('links') || this.$config.links
+    this.init()
   },
   methods: {
+    async init() {
+      const settings = await this.$storage.get(this.$config.name)
+      this.settings = { ...this.$config, ...settings }
+      this.links = this.settings.links
+      this.wallpaper()
+    },
+    wallpaper() {
+      if (!this.settings.wallpaper) return
+      this.backgroundImage = `url(${this.settings.wallpaper}?${Date.now()})`
+    },
     open(index) {
       console.log('open')
       if (!this.editable) {
@@ -62,7 +69,7 @@ export default {
         .sort((a, b) => a.order - b.order)
         .map((i, index) => ({ ...i, order: index + 1 }))
       this.links = links
-      this.$storage.set('links', links)
+      this.$storage.set(this.$config.name, { ...this.settings, links })
       this.$refs.linkForm.close()
       this.editable = false
       this.dialog = false
@@ -72,7 +79,7 @@ export default {
       if (!confirm(this.$i18n('confirmDelete', '确定删除吗？'))) return;
       this.links.splice(index, 1)
       this.links = this.links.map((i, index) => ({ ...i, order: index + 1 }))
-      this.$storage.set('links', this.links)
+      this.$storage.set(this.$config.name, { ...this.settings, links })
       this.$refs.linkForm.close()
       this.editable = false
       this.dialog = false
@@ -96,11 +103,17 @@ export default {
         default:
           console.log(menu)
           break
-        case 'search':
-          console.log(menu)
+        case 'wallpaper':
+          this.wallpaper()
           break
         case 'link':
           this.editable = true
+          break
+        case 'search':
+          console.log(menu)
+          break
+        case 'system':
+          console.log(menu)
           break
       }
     }
@@ -109,10 +122,10 @@ export default {
 </script>
 
 <template>
-  <div class="nice-new-tab" :style="{ backgroundImage }" @click.stop="hideMenu" @contextmenu.prevent="showMenu">
+  <div v-if="settings" class="nice-new-tab" :style="{ backgroundImage }" @click.stop="hideMenu" @contextmenu.prevent.stop="showMenu">
     <div class="main">
       <SearchBar />
-      <div class="links">
+      <div class="links" :style="{ gridTemplateColumns: `repeat(${settings.columns}, 1fr)` }">
         <div v-for="(item, index) in links" :key="item.name" @click.stop="open(index)">
           <LinkItem v-model="links[index]" :editable="editable" :background="!!backgroundImage">
             <div v-if="editable" class="del" @click.stop="del(index)">✖</div>
@@ -120,12 +133,12 @@ export default {
         </div>
         <LinkAdd v-if="editable" @click.stop="add(links.length + 1)" />
       </div>
-      <dialog ref="linkForm" class="link-form">
-        <LinkForm v-if="dialog" v-model="form" @change="save" @cancel="hide" />
-      </dialog>
     </div>
+    <dialog ref="linkForm" class="link-form">
+      <LinkForm v-if="dialog" v-model="form" @change="save" @cancel="hide" />
+    </dialog>
+    <ContextMenu v-model="contextMenu" @change="pickMenu" />
   </div>
-  <ContextMenu v-model="contextMenu" @select="pickMenu" />
 </template>
 
 <style lang="scss" scoped>
@@ -143,7 +156,6 @@ export default {
     gap: 64px;
     .links {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
       justify-items: center;
       gap: 48px;
       .del {
