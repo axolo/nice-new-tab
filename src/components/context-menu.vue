@@ -15,10 +15,10 @@ export default {
     return {
       menus: [[
         { icon: '🔗', name: '编辑链接', emit: 'link' },
-        { icon: '🔎', name: '搜索设置', emit: 'search' },
-        { icon: '⚙️', name: '系统设置', emit: 'system' },
+        // { icon: '🔎', name: '搜索设置', emit: 'search' },
+        // { icon: '⚙️', name: '系统设置', emit: 'system' },
       ], [
-        { icon: '🖼️', name: '更新壁纸', emit: 'wallpaper'}
+        { icon: '🖼️', name: '随机壁纸', emit: 'wallpaper'}
       ]]
     }
   },

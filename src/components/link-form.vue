@@ -75,7 +75,6 @@ export default {
           <input
             v-model="link.order"
             type="number"
-            step="0.1"
             placeholder="排序，数字越小越靠前"
           >
         </div>

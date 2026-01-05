@@ -44,38 +44,41 @@ export default {
       this.backgroundImage = `url(${this.settings.wallpaper}?${Date.now()})`
     },
     open(index) {
-      console.log('open')
       if (!this.editable) {
         location.replace(this.links[index].url)
       } else {
+        // index: 用于判断新增还是编辑
         this.form = this.links[index]
+          ? { ...this.links[index], index }
+          : { order: index + 1, index }
+        this.formIndex = index
         this.dialog = true
         this.$refs.linkForm.showModal()
       }
     },
-    add(order) {
-      console.log('add', this.editable)
-      this.form = { order }
-      this.dialog = true
-      this.$refs.linkForm.showModal()
-    },
-    hide() {
+    close() {
       this.dialog = false
       this.$refs.linkForm.close()
       this.form = {}
     },
     save(link) {
-      const links = [...this.links, link]
-        .sort((a, b) => a.order - b.order)
+      if (link.index >= this.links.length) {
+        this.links.push({ ...link, index: undefined })
+      } else {
+        this.links[link.index] = { ...link, index: undefined }
+      }
+      this.links = [...this.links]
+        .sort((a, b) => a.order - b.order - 1)
         .map((i, index) => ({ ...i, order: index + 1 }))
-      this.links = links
-      this.$storage.set(this.$config.name, { ...this.settings, links })
+      this.$storage.set(this.$config.name, {
+        ...this.settings,
+        links: this.links
+      })
       this.$refs.linkForm.close()
       this.editable = false
       this.dialog = false
     },
     del(index) {
-      console.log('del')
       if (!confirm(this.$i18n('confirmDelete', '确定删除吗？'))) return;
       this.links.splice(index, 1)
       this.links = this.links.map((i, index) => ({ ...i, order: index + 1 }))
@@ -93,8 +96,7 @@ export default {
       }
     },
     hideMenu() {
-      console.log('hideMenu', this.editable)
-      if (this.dialog) return
+      if (this.dialog) return;
       this.contextMenu = { show: false }
       this.editable = false
     },
@@ -102,9 +104,6 @@ export default {
       switch (menu.emit) {
         default:
           console.log(menu)
-          break
-        case 'wallpaper':
-          this.wallpaper()
           break
         case 'link':
           this.editable = true
@@ -114,6 +113,9 @@ export default {
           break
         case 'system':
           console.log(menu)
+          break
+        case 'wallpaper':
+          this.wallpaper()
           break
       }
     }
@@ -131,11 +133,11 @@ export default {
             <div v-if="editable" class="del" @click.stop="del(index)">✖</div>
           </LinkItem>
         </div>
-        <LinkAdd v-if="editable" @click.stop="add(links.length + 1)" />
+        <LinkAdd v-if="editable" @click.stop="open(links.length)" />
       </div>
     </div>
     <dialog ref="linkForm" class="link-form">
-      <LinkForm v-if="dialog" v-model="form" @change="save" @cancel="hide" />
+      <LinkForm v-if="dialog" v-model="form" @change="save" @cancel="close" />
     </dialog>
     <ContextMenu v-model="contextMenu" @change="pickMenu" />
   </div>

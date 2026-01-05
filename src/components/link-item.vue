@@ -16,8 +16,13 @@ export default {
   },
   data() {
     return {
-      link: this.modelValue,
       error: false
+    }
+  },
+  computed: {
+    link() {
+      this.error = false
+      return this.modelValue
     }
   }
 }
@@ -71,11 +76,12 @@ export default {
     }
   }
   .name {
-    max-width: 72px;
+    width: 100%;
     word-break: break-word;
     text-align: center;
     font-size: 14px;
-    color: #666;
+    color: #777;
+    border-radius: 4px;
   }
   .editable {
     border: 1px dashed #ccc;
@@ -84,8 +90,7 @@ export default {
     }
   }
   .background {
-    color: #fff;
-    mix-blend-mode: difference;
+    color: #ddd;
   }
 }
 </style>
